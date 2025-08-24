@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import localforage from "localforage";
 import type { CustomerFormValues } from "../create-customers";
 import { InvoiceForm, type InvoiceFormData } from "./InvoiceForm";
+import { useAtom } from "jotai";
+import { updateAtom } from ".";
 
 export const InvoiceFormContainer: React.FC = () => {
+  const [triggerUpdate, setTriggerUpdate] = useAtom(updateAtom);
   const [customers, setCustomers] = useState<CustomerFormValues[]>([]);
   const [formData, setFormData] = useState<InvoiceFormData>({
     customerId: null,
@@ -27,7 +30,7 @@ export const InvoiceFormContainer: React.FC = () => {
     fetchCustomers();
   }, []);
 
-  const computed = React.useMemo(() => {
+  const computed = useMemo(() => {
     const subtotal = formData.items.reduce((acc, item) => acc + item.price, 0);
     const totalTax = formData.items.reduce(
       (acc, item) => acc + item.price * (item.taxRate / 100),
@@ -92,6 +95,7 @@ export const InvoiceFormContainer: React.FC = () => {
         items: [],
         newItem: { description: "", price: 0, taxRate: 10 },
       });
+      setTriggerUpdate(triggerUpdate + 1);
     } catch (err) {
       console.log(err);
       alert("Error saving invoice");

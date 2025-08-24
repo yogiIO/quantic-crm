@@ -6,6 +6,8 @@ import {
   type InvoiceListRow,
 } from "./InvoiceListingTable";
 import type { CustomerFormValues } from "../create-customers";
+import { useAtom } from "jotai";
+import { updateAtom } from ".";
 
 const RECORDS_PER_PAGE = 10;
 
@@ -31,6 +33,7 @@ export interface Invoice {
 }
 
 export const InvoiceListingContainer: React.FC = () => {
+  const [triggerUpdate] = useAtom(updateAtom);
   const [rows, setRows] = useState<InvoiceListRow[]>([]);
   const [fetching, setFetching] = useState(true);
   const [filterText, setFilterText] = useState("");
@@ -63,7 +66,7 @@ export const InvoiceListingContainer: React.FC = () => {
       setFetching(false);
     };
     fetchRows();
-  }, []);
+  }, [triggerUpdate]);
 
   const filtered = useMemo(() => {
     const lower = filterText.toLowerCase();
